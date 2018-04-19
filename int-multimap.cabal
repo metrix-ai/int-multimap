@@ -3,7 +3,7 @@ name:
 version:
   0.1
 synopsis:
-
+  A data structure that associates each Int key with a set of values
 category:
   Containers
 homepage:
@@ -44,8 +44,6 @@ library
   other-modules:
   build-depends:
     base >=4.7 && <5,
-    time >=1.8 && <2,
     hashable >=1.2 && <2,
-    timestamp >=0.1.0 && <0.1.2,
     containers >=0.5.10 && <0.5.15,
     unordered-containers >=0.2.8.0 && <0.3
