@@ -1,7 +1,7 @@
 name:
   int-multimap
 version:
-  0.1
+  0.1.1
 synopsis:
   A data structure that associates each Int key with a set of values
 category:
