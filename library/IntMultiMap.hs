@@ -33,6 +33,7 @@ import qualified Data.IntMap.Strict as A
 import qualified Data.HashSet as B
 import qualified Data.Foldable as C
 import qualified GHC.Exts as G
+import GHC.Generics
 import Prelude hiding (map, null)
 import Data.Int
 import Data.Hashable
@@ -43,9 +44,9 @@ import Control.Monad
 {-|
 A multi map of integers to values a.
 -}
-  deriving(Foldable)
 newtype IntMultiMap a =
   IntMultiMap (A.IntMap (B.HashSet a))
+  deriving(Foldable, Eq, Show, Generic)
 
 {--------------------------------------------------------------------
   Transformations
