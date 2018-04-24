@@ -43,9 +43,9 @@ import Control.Monad
 {-|
 A multi map of integers to values a.
 -}
-newtype IntMultiMap value =
-  IntMultiMap (A.IntMap (B.HashSet value))
   deriving(Foldable)
+newtype IntMultiMap a =
+  IntMultiMap (A.IntMap (B.HashSet a))
 
 {--------------------------------------------------------------------
   Transformations
@@ -58,8 +58,8 @@ map f (IntMultiMap intMap) = IntMultiMap $
 {--------------------------------------------------------------------
   Lists
 --------------------------------------------------------------------}
-instance (Eq value, Hashable value) => G.IsList (IntMultiMap value) where
-  type Item (IntMultiMap value) = (Int, value)
+instance (Eq a, Hashable a) => G.IsList (IntMultiMap a) where
+  type Item (IntMultiMap a) = (Int, a)
   toList = toList
   fromList = fromList
 
@@ -68,8 +68,8 @@ toList (IntMultiMap multiMap) = do
   (key, hashSet) <- A.toList multiMap
   fmap ((,) key) $ B.toList hashSet
 
-fromList :: (Eq value, Hashable value) =>
-     [(Int, value)] -> IntMultiMap value
+fromList :: (Eq a, Hashable a) =>
+     [(Int, a)] -> IntMultiMap a
 fromList = IntMultiMap . A.fromListWith B.union . fmap (fmap B.singleton)
 
 {--------------------------------------------------------------------
@@ -78,28 +78,28 @@ fromList = IntMultiMap . A.fromListWith B.union . fmap (fmap B.singleton)
 empty :: IntMultiMap a
 empty = IntMultiMap A.empty
 
-singleton :: (Hashable value) => Int -> value -> IntMultiMap value
+singleton :: (Hashable a) => Int -> a -> IntMultiMap a
 singleton k v = IntMultiMap $ A.singleton k $ B.singleton v
 {-# INLINABLE singleton #-}
 
 {--------------------------------------------------------------------
   Basic interface
 --------------------------------------------------------------------}
-null :: IntMultiMap value -> Bool
+null :: IntMultiMap a -> Bool
 null (IntMultiMap intMap) = A.null intMap
 {-# INLINE null #-}
 
-size :: IntMultiMap value -> Int
+size :: IntMultiMap a -> Int
 size = length . toList
 
-member :: Int -> IntMultiMap value -> Bool
+member :: Int -> IntMultiMap a -> Bool
 member key (IntMultiMap intMap) = A.member key intMap
 
-insert :: (Hashable value, Ord value) => Int -> value -> IntMultiMap value -> IntMultiMap value
+insert :: (Hashable a, Ord a) => Int -> a -> IntMultiMap a -> IntMultiMap a
 insert key value (IntMultiMap intMap) =
   IntMultiMap $ A.update (\hash -> Just $ B.insert value hash) key intMap
 
-delete :: (Hashable value, Eq value) => Int {-^ Key -} -> value -> IntMultiMap value -> IntMultiMap value
+delete :: (Hashable a, Eq a) => Int {-^ Key -} -> a -> IntMultiMap a -> IntMultiMap a
 delete key value (IntMultiMap intMap) =
   IntMultiMap $ A.update f key intMap
   where
@@ -109,7 +109,7 @@ delete key value (IntMultiMap intMap) =
 {--------------------------------------------------------------------
   Conversions
 --------------------------------------------------------------------}
-elems :: IntMultiMap value -> [value]
+elems :: IntMultiMap a -> [a]
 elems = foldr (:) []
 
 keys  :: IntMultiMap a -> [Int]
@@ -118,7 +118,7 @@ keys (IntMultiMap intMap) = A.keys intMap
 {--------------------------------------------------------------------
   Filter
 --------------------------------------------------------------------}
-split :: Int -> IntMultiMap value -> (IntMultiMap value, IntMultiMap value)
+split :: Int -> IntMultiMap a -> (IntMultiMap a, IntMultiMap a)
 split key (IntMultiMap intMap) = (IntMultiMap oldMap, IntMultiMap newMap)
   where
     (oldMap, newMap) = A.split key intMap
