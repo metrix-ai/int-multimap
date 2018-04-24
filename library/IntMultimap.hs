@@ -1,4 +1,4 @@
-module IntMultiMap
+module IntMultimap
 (
   IntMultiMap,
 
