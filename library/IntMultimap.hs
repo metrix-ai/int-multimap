@@ -25,7 +25,8 @@ module IntMultimap
   keys,
 
   -- * Filter
-  split
+  split,
+  splitLookup
 )
 where
 
@@ -39,6 +40,7 @@ import Data.Int
 import Data.Hashable
 import Data.Functor
 import Data.List(length)
+import Data.Maybe
 import Control.Monad
 
 {-|
@@ -64,7 +66,7 @@ instance (Eq a, Hashable a) => G.IsList (IntMultiMap a) where
   toList = toList
   fromList = fromList
 
-toList :: IntMultiMap b -> [(Int, b)]
+toList :: IntMultiMap a -> [(Int, a)]
 toList (IntMultiMap multiMap) = do
   (key, hashSet) <- A.toList multiMap
   fmap ((,) key) $ B.toList hashSet
@@ -98,7 +100,9 @@ member key (IntMultiMap intMap) = A.member key intMap
 
 insert :: (Hashable a, Ord a) => Int -> a -> IntMultiMap a -> IntMultiMap a
 insert key value (IntMultiMap intMap) =
-  IntMultiMap $ A.update (\hash -> Just $ B.insert value hash) key intMap
+  IntMultiMap $ A.insertWith (f value) key (B.singleton value) intMap
+    where
+      f v new old = B.insert v old
 
 delete :: (Hashable a, Eq a) => Int {-^ Key -} -> a -> IntMultiMap a -> IntMultiMap a
 delete key value (IntMultiMap intMap) =
@@ -123,3 +127,8 @@ split :: Int -> IntMultiMap a -> (IntMultiMap a, IntMultiMap a)
 split key (IntMultiMap intMap) = (IntMultiMap oldMap, IntMultiMap newMap)
   where
     (oldMap, newMap) = A.split key intMap
+
+splitLookup :: Int -> IntMultiMap a -> (IntMultiMap a, Maybe (B.HashSet a), IntMultiMap a)
+splitLookup key (IntMultiMap intMap) = (IntMultiMap oldMap, elemHashSet, IntMultiMap newMap)
+  where
+    (oldMap, elemHashSet, newMap) = A.splitLookup key intMap
