@@ -62,9 +62,21 @@ main =
       assertEqual "" list $ A.toList $ A.singleton 1 'a'
       assertEqual "" (A.toList multimap) $ A.toList $ A.singleton 1 'a'
     ,
-    testProperty "list to list" $ \ (list :: [(Int, Char)]) ->
+    testProperty "list to list(Int, String)" $ \ (list :: [(Int, String)]) ->
     (B.fromList list) === (B.fromList $ A.toList $ A.fromList list)
     ,
-    testProperty "list to list" $ \ (list :: [(Int, Int)]) ->
+    testProperty "list to list(Int, Int)" $ \ (list :: [(Int, Int)]) ->
     (B.fromList list) === (B.fromList $ A.toList $ A.fromList list)
+    ,
+    testProperty "insert and delete" $ \ (list :: [(Int, Char)], key :: Int, value :: Char) ->
+    (B.fromList list) === (B.fromList $ A.toList $ A.delete key value $ A.insert key value $ A.fromList list)
+    ,
+    testProperty "Mapping" $ \ (list :: [(Int, Int)]) ->
+    (B.fromList $ map testFuncL list) === (B.fromList $ A.toList $ A.map testFunc $ A.fromList list)
   ]
+
+testFunc :: (Show a) => a -> String
+testFunc = show
+
+testFuncL :: (Show a)  => (Int, a) -> (Int, String)
+testFuncL (a, b) = (a, show b)
