@@ -13,6 +13,9 @@ module IntMultimap
   -- * Transformations
   map,
 
+  -- * Folds
+  foldlWithKey',
+
   -- * Basic interface
   null,
   size,
@@ -119,6 +122,12 @@ elems = foldr (:) []
 
 keys  :: IntMultimap a -> [Int]
 keys (IntMultimap intMap) = A.keys intMap
+
+{--------------------------------------------------------------------
+  Fold
+--------------------------------------------------------------------}
+foldlWithKey' :: (Int -> a -> b -> a) -> a -> IntMultimap b -> a
+foldlWithKey' f v (IntMultimap intMap) = A.foldlWithKey' (\a k set -> B.foldl' (f k) a set) v intMap
 
 {--------------------------------------------------------------------
   Filter
